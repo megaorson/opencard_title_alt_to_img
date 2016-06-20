@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modification>
+    <code>catalog_product_img_title_alt</code>
+    <name>Add title and alt for image</name>
+    <version>1.0</version>
+    <author>Orson</author>
+    <link>http://orson.kiev.ua</link>
+    <!--admin begin-->
+   <file path="admin/model/catalog/product.php">
+        <operation>
+           <search><![CDATA[
+           $this->db->query("INSERT INTO " . DB_PREFIX . "product_image SET product_id = '" . (int)$product_id . "', image = '" . $this->db->escape($product_image['image']) . "', sort_order = '" . (int)$product_image['sort_order'] . "'");
+           ]]></search>
+           <add position="replace"><![CDATA[
+           $this->db->query("INSERT INTO " . DB_PREFIX . "product_image SET product_id = '" . (int)$product_id . "', image = '" . $this->db->escape($product_image['image']) . "', sort_order = '" . (int)$product_image['sort_order'] . "', title_img = '" . $product_image['title_img'] . "', alt_img = '" . $product_image['alt_img'] . "'");
+           ]]></add>
+        </operation>
+        <operation>
+           <search><![CDATA[
+           'tag'              => $result['tag']
+           ]]></search>
+           <add position="alter"><![CDATA[
+           'alt_img'              => $result['alt_img'],
+           'title_img'              => $result['title_img']
+           ]]></add>
+        </operation>
+        <operation>
+           <search><![CDATA[
+           "', meta_keyword = '" . $this->db->escape($value['meta_keyword'])
+           ]]></search>
+           <add position="replace"><![CDATA[
+                "', meta_keyword = '" . $this->db->escape($value['meta_keyword']) . "',alt_img = '" . $this->db->escape($value['alt_img']) . "',title_img = '" . $this->db->escape($value['title_img'])
+           ]]></add>
+        </operation>
+    </file>
+    <file path="admin/view/template/catalog/product_form.tpl">
+        <operation>
+           <search><![CDATA[
+           <div class="tab-pane" id="language<?php echo $language['language_id']; ?>">
+           ]]></search>
+           <add position="after"><![CDATA[
+           <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-title_img<?php echo $language['language_id']; ?>"><?php echo $entry_title_img; ?></label>
+                <div class="col-sm-10">
+                  <input type="text" name="product_description[<?php echo $language['language_id']; ?>][title_img]" value="<?php echo isset($product_description[$language['language_id']]) ? $product_description[$language['language_id']]['title_img'] : ''; ?>" placeholder="<?php echo $entry_title_img; ?>" id="input-title_img<?php echo $language['language_id']; ?>" class="form-control" />
+                  <?php if (isset($error_title_img[$language['language_id']])) { ?>
+                  <div class="text-danger"><?php echo $error_title_img[$language['language_id']]; ?></div>
+                  <?php } ?>
+                </div>
+              </div>
+               <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-alt_img<?php echo $language['language_id']; ?>"><?php echo $entry_alt_img; ?></label>
+                <div class="col-sm-10">
+                  <input type="text" name="product_description[<?php echo $language['language_id']; ?>][alt_img]" value="<?php echo isset($product_description[$language['language_id']]) ? $product_description[$language['language_id']]['alt_img'] : ''; ?>" placeholder="<?php echo $entry_alt_img; ?>" id="input-alt_img<?php echo $language['language_id']; ?>" class="form-control" />
+                  <?php if (isset($error_alt_img[$language['language_id']])) { ?>
+                  <div class="text-danger"><?php echo $error_alt_img[$language['language_id']]; ?></div>
+                  <?php } ?>
+                </div>
+              </div>
+           ]]></add>
+        </operation>
+        <operation>
+           <search><![CDATA[
+           <input type="text" name="product_image[<?php echo $image_row; ?>][sort_order]" value="<?php echo $product_image['sort_order']; ?>" placeholder="<?php echo $entry_sort_order; ?>" class="form-control" />
+           ]]></search>
+           <add position="replace"><![CDATA[
+            <input type="text" name="product_image[<?php echo $image_row; ?>][sort_order]" value="<?php echo $product_image['sort_order']; ?>" placeholder="<?php echo $entry_sort_order; ?>" class="form-control" />
+            <input type="text" name="product_image[<?php echo $image_row; ?>][title_img]" value="<?php echo $product_image['title_img']; ?>" placeholder="<?php echo $entry_title_img; ?>" class="form-control" />
+            <input type="text" name="product_image[<?php echo $image_row; ?>][alt_img]" value="<?php echo $product_image['alt_img']; ?>" placeholder="<?php echo $entry_alt_img; ?>" class="form-control" />
+           ]]></add>
+        </operation>
+        <operation>
+           <search><![CDATA[
+           <input type="text" name="product_image[' + image_row + '][sort_order]" value="" placeholder="<?php echo $entry_sort_order; ?>" class="form-control" />
+           ]]></search>
+           <add position="replace"><![CDATA[' +
+            '<input type="text" name="product_image[' + image_row + '][sort_order]" value="" placeholder="<?php echo $entry_sort_order; ?>" class="form-control" />' +
+            '<input type="text" name="product_image[' + image_row + '][title_img]" value="" placeholder="<?php echo $entry_title_img; ?>" class="form-control" />' +
+            '<input type="text" name="product_image[' + image_row + '][alt_img]" value="" placeholder="<?php echo $entry_alt_img; ?>" class="form-control" />' +
+           ']]></add>
+        </operation>
+    </file>
+    <file path="admin/controller/catalog/product.php">
+        <operation>
+           <search><![CDATA[
+           protected function getForm() {
+           ]]></search>
+           <add position="after"><![CDATA[
+            $data['entry_title_img'] = $this->language->get('entry_title_img');
+            if (isset($this->error['canonical'])) {
+                $data['error_title_img'] = $this->error['title_img'];
+            } else {
+                $data['error_title_img'] = array();
+            }
+            $data['entry_alt_img'] = $this->language->get('entry_alt_img');
+            if (isset($this->error['alt_img'])) {
+                $data['error_alt_img'] = $this->error['alt_img'];
+            } else {
+                $data['error_alt_img'] = array();
+            }
+           ]]></add>
+        </operation>
+        <operation>
+           <search><![CDATA[
+           'sort_order' => $product_image['sort_order']
+           ]]></search>
+           <add position="after"><![CDATA[
+            ,'title_img' => $product_image['title_img'],
+            'alt_img' => $product_image['alt_img'],
+           ]]></add>
+        </operation>
+    </file>
+    <file path="admin/language/english/catalog/product.php">
+        <operation>
+           <search><![CDATA[
+           $_['error_keyword']          = 'SEO keyword already in use!';
+           ]]></search>
+           <add position="after"><![CDATA[
+           $_['entry_title_img']          = 'Title for img error';
+           $_['error_title_img']          = 'Some error';
+           $_['entry_alt_img']          = 'Alt for img error';
+           $_['error_alt_img']          = 'Some error';
+           ]]></add>
+        </operation>
+    </file>
+    <file path="admin/language/russian/catalog/product.php">
+        <operation>
+           <search><![CDATA[
+           $_['error_keyword']          = 'Данный SEO урл уже используются!';
+           ]]></search>
+           <add position="after"><![CDATA[
+           $_['entry_title_img']          = 'Тайтл для картинки';
+           $_['error_title_img']          = 'Ошибка';
+           $_['entry_alt_img']          = 'Alt для картинки';
+           $_['error_alt_img']          = 'Ошибка';
+           ]]></add>
+        </operation>
+    </file>
+    <!--admin end-->
+    
+    <!--catalog begin-->
+    <file path="catalog/model/catalog/product.php">
+        <operation>
+           <search><![CDATA[
+           'meta_keyword'     => $query->row['meta_keyword'],
+           ]]></search>
+           <add position="after"><![CDATA[
+            'alt_img'     => $query->row['alt_img'],
+            'title_img'     => $query->row['title_img'],
+           ]]></add>
+        </operation>
+    </file>
+    <file path="catalog/controller/product/product.php">
+        <operation>
+           <search><![CDATA[
+           $this->load->model('tool/image');
+           ]]></search>
+           <add position="after"><![CDATA[
+            if ($product_info['alt_img']) {
+				$data['alt_img'] = $product_info['alt_img'];
+			} else {
+				$data['alt_img'] = '';
+			}
+            if ($product_info['title_img']) {
+				$data['title_img'] = $product_info['title_img'];
+			} else {
+				$data['title_img'] = '';
+			}
+           ]]></add>
+        </operation>
+        <operation>
+           <search><![CDATA[
+           $data['images'][] = array(
+           ]]></search>
+           <add position="after"><![CDATA[
+               "title_img"=>$result['title_img'],
+               "alt_img"=>$result['alt_img'],
+           ]]></add>
+        </operation>
+    </file>
+    
+    <!--catalog end-->
+</modification>
