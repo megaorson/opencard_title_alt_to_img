@@ -31,7 +31,7 @@
     <file path="admin/controller/setting/setting.php">
         <operation>
            <search><![CDATA[
-           public function index() {
+           $this->load->language('setting/setting');
            ]]></search>
            <add position="after"><![CDATA[
             $data['entry_title_image'] = $this->language->get('entry_title_image');
