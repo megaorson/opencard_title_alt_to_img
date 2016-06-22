@@ -2,11 +2,73 @@
 <modification>
     <code>catalog_product_img_title_alt</code>
     <name>Add title and alt for image</name>
-    <version>1.0</version>
+    <version>1.1</version>
     <author>Orson</author>
     <link>http://orson.kiev.ua</link>
     <!--admin begin-->
-   <file path="admin/model/catalog/product.php">
+    <file path="admin/view/template/setting/setting.tpl">
+        <operation>
+           <search><![CDATA[
+           <div class="tab-pane" id="tab-image">
+           ]]></search>
+           <add position="after"><![CDATA[
+              <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-title-image"><?php echo $entry_title_image; ?></label>
+                <div class="col-sm-10">
+                  <div class="row">
+                    <div class="col-sm-6">
+                      <input type="text" name="config_title_image" value="<?php echo $config_title_image; ?>" id="input-title-image" class="form-control" />
+                    </div>
+                    <div class="col-sm-6">
+                      <input type="text" name="config_alt_image" value="<?php echo $config_alt_image; ?>"  class="form-control" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+           ]]></add>
+        </operation>
+    </file>
+    <file path="admin/controller/setting/setting.php">
+        <operation>
+           <search><![CDATA[
+           public function index() {
+           ]]></search>
+           <add position="after"><![CDATA[
+            $data['entry_title_image'] = $this->language->get('entry_title_image');
+            if (isset($this->request->post['config_title_image'])) {
+                $data['config_title_image'] = $this->request->post['config_title_image'];
+            } else {
+                $data['config_title_image'] = $this->config->get('config_title_image');
+            }
+            if (isset($this->request->post['config_alt_image'])) {
+                $data['config_alt_image'] = $this->request->post['config_alt_image'];
+            } else {
+                $data['config_alt_image'] = $this->config->get('config_alt_image');
+            }
+           ]]></add>
+        </operation>
+    </file>
+    <file path="admin/language/english/setting/setting.php">
+        <operation>
+           <search><![CDATA[
+           <?php
+           ]]></search>
+           <add position="after"><![CDATA[
+           $_['entry_title_image']          = 'Title and alt for img logo';
+           ]]></add>
+        </operation>
+    </file>
+    <file path="admin/language/russian/setting/setting.php">
+        <operation>
+           <search><![CDATA[
+           <?php
+           ]]></search>
+           <add position="after"><![CDATA[
+           $_['entry_title_image']          = 'Title и alt для картинки лого';
+           ]]></add>
+        </operation>
+    </file>
+    <file path="admin/model/catalog/product.php">
         <operation>
            <search><![CDATA[
            $this->db->query("INSERT INTO " . DB_PREFIX . "product_image SET product_id = '" . (int)$product_id . "', image = '" . $this->db->escape($product_image['image']) . "', sort_order = '" . (int)$product_image['sort_order'] . "'");
@@ -175,6 +237,25 @@
            <add position="after"><![CDATA[
                "title_img"=>$result['title_img'],
                "alt_img"=>$result['alt_img'],
+           ]]></add>
+        </operation>
+    </file>
+    <file path="catalog/controller/common/header.php">
+        <operation>
+           <search><![CDATA[
+            public function index() {
+           ]]></search>
+           <add position="after"><![CDATA[
+            if ($this->config->get('config_title_image')) {
+                $data['config_title_image'] = $this->config->get('config_title_image');
+            } else {
+                $data['config_title_image'] = '';
+            }
+            if ($this->config->get('config_alt_image')) {
+                $data['config_alt_image'] = $this->config->get('config_alt_image');
+            } else {
+                $data['config_alt_image'] = '';
+            }
            ]]></add>
         </operation>
     </file>
