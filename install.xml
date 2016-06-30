@@ -259,6 +259,17 @@
            ]]></add>
         </operation>
     </file>
+    <file path="catalog/controller/product/category.php">
+        <operation>
+           <search><![CDATA[
+            'product_id'  => $result['product_id'],
+           ]]></search>
+           <add position="after"><![CDATA[
+            "title_img"=>$result['title_img'],
+            "alt_img"=>$result['alt_img'],
+           ]]></add>
+        </operation>
+    </file>
     
     <!--catalog end-->
 </modification>
